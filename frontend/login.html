@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - S4H-1 Ride Safety</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        danger: '#dc2626',
+                        success: '#16a34a',
+                        accent: '#0ea5e9',
+                        slate: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 20px 40px -15px rgba(0, 0, 0, 0.05)',
+                        'card': '0 0 0 1px rgba(0,0,0,0.03), 0 2px 8px rgba(0,0,0,0.04)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .hero-gradient {
+            background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 40%),
+                radial-gradient(circle at bottom left, rgba(14, 165, 233, 0.05), transparent 40%);
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4 hero-gradient text-slate-900">
+    <div class="w-full max-w-md animate-fade-in">
+        <!-- Logo -->
+        <div class="text-center mb-10">
+            <a href="/" class="inline-flex items-center gap-3 group">
+                <div
+                    class="bg-primary p-2.5 rounded-xl shadow-lg shadow-blue-200 group-hover:scale-110 transition-transform duration-300">
+                    <i data-lucide="shield-check" class="text-white w-8 h-8"></i>
+                </div>
+                <span class="text-3xl font-display font-bold tracking-tight text-slate-900">S4H-1</span>
+            </a>
+            <p class="text-slate-500 mt-2 font-medium">Secure Ride Monitoring System</p>
+        </div>
+
+        <!-- Login Card -->
+        <div class="bg-white rounded-[32px] shadow-soft border border-slate-100 p-8 md:p-10 relative overflow-hidden">
+            <!-- Decorative blur -->
+            <div
+                class="absolute -top-20 -right-20 w-40 h-40 bg-blue-50 rounded-full blur-3xl opacity-50 pointer-events-none">
+            </div>
+
+            <h2 class="text-2xl font-bold mb-8 text-center relative z-10">Welcome Back</h2>
+
+            <!-- Error Message -->
+            <div id="error-message"
+                class="hidden mb-6 p-4 bg-danger/5 border border-danger/10 rounded-2xl flex items-start gap-3">
+                <i data-lucide="alert-circle" class="w-5 h-5 text-danger shrink-0 mt-0.5"></i>
+                <p class="text-danger text-sm font-medium pt-0.5 leading-snug"></p>
+            </div>
+
+            <!-- Success Message -->
+            <div id="success-message"
+                class="hidden mb-6 p-4 bg-success/5 border border-success/10 rounded-2xl flex items-start gap-3">
+                <i data-lucide="check-circle-2" class="w-5 h-5 text-success shrink-0 mt-0.5"></i>
+                <p class="text-success text-sm font-medium pt-0.5 leading-snug"></p>
+            </div>
+
+            <form id="login-form" class="space-y-5 relative z-10">
+                <div>
+                    <label class="block text-slate-700 text-sm font-bold mb-2 ml-1">Username</label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i data-lucide="user"
+                                class="h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors"></i>
+                        </div>
+                        <input type="text" id="username" name="username" required
+                            class="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm font-medium"
+                            placeholder="Enter username">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-slate-700 text-sm font-bold mb-2 ml-1">Password</label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i data-lucide="lock"
+                                class="h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors"></i>
+                        </div>
+                        <input type="password" id="password" name="password" required
+                            class="w-full pl-11 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm font-medium"
+                            placeholder="••••••••">
+                        <button type="button" id="toggle-password"
+                            class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors">
+                            <i data-lucide="eye" class="h-5 w-5"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between mt-3 px-1">
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="checkbox" id="remember"
+                                class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/20 accent-primary cursor-pointer">
+                            <span
+                                class="ml-2 text-sm text-slate-500 group-hover:text-slate-700 transition-colors">Remember
+                                me</span>
+                        </label>
+                        <a href="#" class="text-sm font-bold text-primary hover:text-blue-700 transition-colors">Forgot
+                            password?</a>
+                    </div>
+                </div>
+
+                <button type="submit" id="login-btn"
+                    class="w-full bg-primary hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2">
+                    <span id="login-text">Sign In securely</span>
+                    <span id="login-spinner" class="hidden flex items-center gap-2">
+                        <i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i>
+                        Verifying...
+                    </span>
+                    <i data-lucide="arrow-right" class="w-5 h-5" id="btn-icon"></i>
+                </button>
+            </form>
+
+            <div class="mt-8 pt-8 border-t border-slate-100 text-center">
+                <p class="text-slate-500 text-sm mb-4">Don't have an account?</p>
+                <a href="/register"
+                    class="inline-flex items-center justify-center w-full py-3.5 border-2 border-slate-100 rounded-2xl font-bold text-slate-600 hover:border-slate-200 hover:text-slate-900 hover:bg-slate-50 transition-all">
+                    Create New Account
+                </a>
+            </div>
+
+            <!-- Demo Hints -->
+            <div class="mt-8 p-4 bg-slate-50 rounded-2xl border border-slate-100 text-center">
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-2">Internal Use Only</p>
+                <div class="flex flex-wrap text-left justify-center gap-2 text-xs text-slate-500">
+                    <span class="bg-white px-2 py-1 rounded border border-slate-200" title="Admin">admin /
+                        admin123</span>
+                    <span class="bg-white px-2 py-1 rounded border border-slate-200" title="Passenger">priya /
+                        passenger123</span>
+                    <span class="bg-white px-2 py-1 rounded border border-slate-200" title="Operator">operator1 /
+                        operator123</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-8 space-x-6 text-sm font-medium text-slate-400">
+            <a href="#" class="hover:text-slate-600 transition-colors">Privacy</a>
+            <a href="#" class="hover:text-slate-600 transition-colors">Terms</a>
+            <a href="#" class="hover:text-slate-600 transition-colors">Contact Support</a>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed top-6 right-6 z-[100] flex flex-col gap-3"></div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+
+        // --- Interaction Logic ---
+        function showToast(title, message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let icon = 'info';
+            let bgClass = 'bg-slate-900';
+
+            if (type === 'success') { icon = 'check-circle'; bgClass = 'bg-success'; }
+
+            toast.className = `${bgClass} text-white p-4 rounded-2xl shadow-2xl flex items-start gap-3 min-w-[280px] max-w-sm animate-in fade-in slide-in-from-top-4 duration-300 pointer-events-auto cursor-pointer`;
+            toast.onclick = () => toast.remove();
+
+            toast.innerHTML = `
+                <i data-lucide="${icon}" class="w-5 h-5 mt-0.5"></i>
+                <div>
+                    <p class="font-bold text-sm">${title}</p>
+                    <p class="text-xs opacity-90">${message}</p>
+                </div>
+            `;
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-[-10px]');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Auto-fill Demo Creds
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('span[title]').forEach(span => {
+                span.style.cursor = 'pointer';
+                span.classList.add('hover:bg-slate-100', 'transition-colors');
+                span.onclick = () => {
+                    const [u, p] = span.textContent.split(' / ');
+                    document.getElementById('username').value = u.trim();
+                    document.getElementById('password').value = p.trim();
+                    showToast('Auto-Fill', `Credentials for ${u.trim()} loaded.`);
+                };
+            });
+
+            // Footer Links
+            const links = document.querySelectorAll('.text-center.space-x-6 a');
+            if (links.length >= 3) {
+                links[0].onclick = (e) => { e.preventDefault(); showToast('Privacy Policy', 'Standard privacy policy applies.'); };
+                links[1].onclick = (e) => { e.preventDefault(); showToast('Terms', 'Standard terms of service apply.'); };
+                links[2].onclick = (e) => { e.preventDefault(); showToast('Support', 'Contacting support team...'); };
+            }
+
+            // Forgot Password
+            const forgot = document.querySelector('a[href="#"]');
+            if (forgot && forgot.textContent.includes('Forgot')) {
+                forgot.onclick = (e) => { e.preventDefault(); showToast('Reset Password', 'Reset link sent to your email.', 'success'); };
+            }
+        });
+
+        // Toggle password
+        document.getElementById('toggle-password').addEventListener('click', function () {
+            const input = document.getElementById('password');
+            const icon = this.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        });
+
+        // Submit form
+        document.getElementById('login-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('login-btn');
+            const text = document.getElementById('login-text');
+            const spinner = document.getElementById('login-spinner');
+            const icon = document.getElementById('btn-icon');
+            const errorMsg = document.getElementById('error-message');
+            const successMsg = document.getElementById('success-message');
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+
+            // Loading state
+            btn.disabled = true;
+            text.classList.add('hidden');
+            icon.classList.add('hidden');
+            spinner.classList.remove('hidden');
+            errorMsg.classList.add('hidden');
+            successMsg.classList.add('hidden');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, remember })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    sessionStorage.setItem('user_id', data.user.id);
+                    sessionStorage.setItem('username', data.user.username);
+                    sessionStorage.setItem('role', data.user.role);
+                    if (remember && data.token) localStorage.setItem('auth_token', data.token);
+
+                    successMsg.querySelector('p').textContent = 'Authentication verified. Redirecting...';
+                    successMsg.classList.remove('hidden');
+
+                    setTimeout(() => {
+                        const routes = {
+                            'admin': '/admin_console',
+                            'operator': '/operator_dashboard',
+                            'driver': '/operator_dashboard',
+                            'passenger': '/passenger_dashboard'
+                        };
+                        window.location.href = routes[data.user.role] || '/';
+                    }, 800);
+                } else {
+                    throw new Error(data.message || 'Invalid credentials');
+                }
+            } catch (err) {
+                console.error(err);
+                errorMsg.querySelector('p').textContent = err.message || 'Connection failed';
+                errorMsg.classList.remove('hidden');
+
+                // Shake animation on card
+                const card = document.querySelector('.bg-white');
+                card.animate([
+                    { transform: 'translateX(0)' },
+                    { transform: 'translateX(-4px)' },
+                    { transform: 'translateX(4px)' },
+                    { transform: 'translateX(0)' }
+                ], { duration: 300 });
+
+            } finally {
+                btn.disabled = false;
+                text.classList.remove('hidden');
+                icon.classList.remove('hidden');
+                spinner.classList.add('hidden');
+            }
+        });
+
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

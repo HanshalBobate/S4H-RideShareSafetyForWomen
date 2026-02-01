@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride-Safe | Safety Monitoring & Alerts</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS for modern layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        danger: '#dc2626',
+                        success: '#16a34a',
+                        accent: '#0ea5e9',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 10px -2px rgba(0, 0, 0, 0.03)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        h1, h2, h3 { font-family: 'Poppins', sans-serif; }
+        
+        .alert-enter {
+            animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .severity-critical { border-left: 4px solid #dc2626; }
+        .severity-warning { border-left: 4px solid #f59e0b; }
+        .severity-safe { border-left: 4px solid #16a34a; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="text-slate-900">
+
+    <!-- Top Navigation -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="bg-primary p-2 rounded-lg">
+                    <i data-lucide="shield-check" class="text-white w-6 h-6"></i>
+                </div>
+                <span class="text-xl font-display font-bold tracking-tight">S4H-1</span>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <!-- Role Switcher (For Demo) -->
+                <div class="hidden md:flex bg-slate-100 p-1 rounded-full text-sm font-medium">
+                    <button onclick="setRole('passenger')" id="role-passenger" class="px-4 py-1.5 rounded-full transition-all">Passenger</button>
+                    <button onclick="setRole('operator')" id="role-operator" class="px-4 py-1.5 rounded-full transition-all">Operator</button>
+                    <button onclick="setRole('admin')" id="role-admin" class="px-4 py-1.5 rounded-full transition-all">Admin</button>
+                </div>
+                
+                <div class="relative">
+                    <i data-lucide="bell" class="w-6 h-6 text-slate-500 cursor-pointer"></i>
+                    <span id="notif-count" class="absolute -top-1 -right-1 bg-danger text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold hidden">0</span>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="User">
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Dashboard Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <p id="view-indicator" class="text-primary font-semibold text-sm uppercase tracking-wider mb-1">Operator Dashboard</p>
+                <h1 id="dashboard-title" class="text-3xl font-bold">Live Safety Feed</h1>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="simulateDeviation()" class="bg-white border border-slate-200 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors flex items-center gap-2">
+                    <i data-lucide="zap" class="w-4 h-4 text-accent"></i>
+                    Simulate Deviation
+                </button>
+                <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">
+                    Export Log
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <div id="stats-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Stats will be injected here -->
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Feed -->
+            <div class="lg:col-span-2 space-y-6">
+                <section>
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-bold flex items-center gap-2">
+                            <i data-lucide="activity" class="w-5 h-5 text-primary"></i>
+                            Active Monitoring
+                        </h2>
+                        <span class="text-xs text-slate-500 font-medium bg-slate-100 px-2 py-1 rounded">Live Updates Every 5s</span>
+                    </div>
+                    
+                    <div id="alerts-list" class="space-y-4">
+                        <!-- Alert Cards will be injected here -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Sidebar: System Logs / Details -->
+            <div class="space-y-6">
+                <section class="bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden">
+                    <div class="p-4 border-b border-slate-100 bg-slate-50/50">
+                        <h3 class="font-bold flex items-center gap-2 text-sm">
+                            <i data-lucide="clipboard-list" class="w-4 h-4 text-slate-500"></i>
+                            Recent Actions
+                        </h3>
+                    </div>
+                    <div id="action-logs" class="p-4 space-y-4 max-h-[400px] overflow-y-auto">
+                        <!-- Logs injected here -->
+                    </div>
+                </section>
+
+                <section class="bg-primary rounded-2xl p-6 text-white shadow-lg shadow-blue-100 relative overflow-hidden">
+                    <i data-lucide="shield" class="absolute -right-4 -bottom-4 w-32 h-32 text-blue-400/20"></i>
+                    <h3 class="font-display font-bold text-lg mb-2">Emergency Protocol</h3>
+                    <p class="text-blue-100 text-sm mb-4">Direct line to authorities is active. Use with caution.</p>
+                    <button class="w-full bg-white text-primary py-2 rounded-xl font-bold text-sm hover:bg-blue-50 transition-colors">
+                        Call Dispatch
+                    </button>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Incident Detail Modal (Hidden by default) -->
+    <div id="incident-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[110] flex flex-col gap-3"></div>
+
+    <script>
+        // --- State Management ---
+        let currentRole = 'operator';
+        let alerts = [
+            {
+                id: 'AL-8291',
+                passenger: 'Sarah Jenkins',
+                driver: 'Mark T.',
+                rideId: 'RD-440',
+                type: 'Route Deviation',
+                severity: 'warning',
+                time: '2 mins ago',
+                status: 'pending',
+                lat: 34.0522,
+                lng: -118.2437,
+                message: 'Vehicle has diverted 300m from planned route.'
+            },
+            {
+                id: 'AL-8292',
+                passenger: 'James Wu',
+                driver: 'Sarah L.',
+                rideId: 'RD-442',
+                type: 'Sudden Stop',
+                severity: 'critical',
+                time: 'Just now',
+                status: 'pending',
+                lat: 34.0722,
+                lng: -118.2637,
+                message: 'Excessive G-Force detected at intersection.'
+            }
+        ];
+
+        let logs = [
+            { id: 1, action: 'Operator John acknowledged AL-8288', time: '10:45 AM' },
+            { id: 2, action: 'System check complete', time: '10:30 AM' }
+        ];
+
+        // --- Core Functions ---
+
+        function init() {
+            lucide.createIcons();
+            setRole('operator');
+            renderAlerts();
+            renderStats();
+            renderLogs();
+        }
+
+        function setRole(role) {
+            currentRole = role;
+            
+            // Update UI styles
+            const roles = ['passenger', 'operator', 'admin'];
+            roles.forEach(r => {
+                const btn = document.getElementById(`role-${r}`);
+                if (btn) {
+                    if (r === role) {
+                        btn.classList.add('bg-white', 'shadow-sm', 'text-primary');
+                        btn.classList.remove('text-slate-500');
+                    } else {
+                        btn.classList.remove('bg-white', 'shadow-sm', 'text-primary');
+                        btn.classList.add('text-slate-500');
+                    }
+                }
+            });
+
+            // Update Labels
+            const indicator = document.getElementById('view-indicator');
+            const title = document.getElementById('dashboard-title');
+            
+            if (role === 'passenger') {
+                indicator.innerText = "My Journey Safety";
+                title.innerText = "Active Ride Status";
+            } else if (role === 'operator') {
+                indicator.innerText = "Operator Dashboard";
+                title.innerText = "Live Safety Feed";
+            } else {
+                indicator.innerText = "Admin Console";
+                title.innerText = "System Overview";
+            }
+
+            renderStats();
+            renderAlerts();
+            addLog(`Switched view to ${role.toUpperCase()}`);
+        }
+
+        function renderStats() {
+            const container = document.getElementById('stats-container');
+            const data = [
+                { label: 'Active Rides', value: '1,284', icon: 'car', color: 'text-primary' },
+                { label: 'Pending Alerts', value: alerts.filter(a => a.status === 'pending').length, icon: 'alert-triangle', color: 'text-danger' },
+                { label: 'Avg Response', value: '42s', icon: 'clock', color: 'text-accent' },
+                { label: 'Safety Score', value: '99.4%', icon: 'shield', color: 'text-success' },
+            ];
+
+            container.innerHTML = data.map(stat => `
+                <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-100">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-slate-500 text-sm font-medium">${stat.label}</span>
+                        <i data-lucide="${stat.icon}" class="w-5 h-5 ${stat.color}"></i>
+                    </div>
+                    <div class="text-2xl font-bold">${stat.value}</div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderAlerts() {
+            const list = document.getElementById('alerts-list');
+            
+            if (currentRole === 'passenger') {
+                list.innerHTML = `
+                    <div class="bg-success/10 border border-success/20 p-8 rounded-2xl text-center">
+                        <div class="bg-success w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="check" class="text-white"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-success">Your ride is secure</h3>
+                        <p class="text-slate-600 text-sm">No deviations detected in your current trip to Downtown.</p>
+                    </div>
+                `;
+            } else {
+                list.innerHTML = alerts.filter(a => a.status === 'pending').map(alert => `
+                    <div class="alert-enter bg-white p-5 rounded-2xl shadow-soft border border-slate-100 flex flex-col md:flex-row gap-6 severity-${alert.severity} group hover:shadow-md transition-all">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getSeverityBadge(alert.severity)}">
+                                    ${alert.type}
+                                </span>
+                                <span class="text-xs text-slate-400 font-medium">${alert.time} • ${alert.id}</span>
+                            </div>
+                            <h3 class="font-bold text-slate-900 group-hover:text-primary transition-colors">${alert.passenger} • Ride ${alert.rideId}</h3>
+                            <p class="text-sm text-slate-500 mt-1">${alert.message}</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="viewIncident('${alert.id}')" class="text-xs font-semibold px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50">Details</button>
+                            <button onclick="acknowledgeAlert('${alert.id}')" class="text-xs font-semibold px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800">Acknowledge</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            lucide.createIcons();
+        }
+
+        function getSeverityBadge(sev) {
+            if (sev === 'critical') return 'bg-danger/10 text-danger';
+            if (sev === 'warning') return 'bg-orange-100 text-orange-600';
+            return 'bg-success/10 text-success';
+        }
+
+        function acknowledgeAlert(id) {
+            const alert = alerts.find(a => a.id === id);
+            alert.status = 'resolved';
+            addLog(`Operator acknowledged ${id}`);
+            renderAlerts();
+            renderStats();
+            showToast("Alert Acknowledged", `Case ${id} has been moved to logs.`);
+        }
+
+        function viewIncident(id) {
+            const alert = alerts.find(a => a.id === id);
+            const modal = document.getElementById('incident-modal');
+            const content = document.getElementById('modal-content');
+            
+            content.innerHTML = `
+                <div class="p-6 flex justify-between items-start border-b border-slate-100">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                             <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${getSeverityBadge(alert.severity)}">${alert.severity}</span>
+                             <span class="text-xs text-slate-400">${alert.id}</span>
+                        </div>
+                        <h2 class="text-xl font-bold">Incident Investigation</h2>
+                    </div>
+                    <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+                <div class="p-8">
+                    <div class="grid grid-cols-2 gap-8 mb-8">
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Passenger Information</p>
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-primary">SJ</div>
+                                <div>
+                                    <p class="font-bold text-sm">${alert.passenger}</p>
+                                    <p class="text-xs text-slate-500">+1 (555) 012-3456</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Driver Details</p>
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-accent">MT</div>
+                                <div>
+                                    <p class="font-bold text-sm">${alert.driver}</p>
+                                    <p class="text-xs text-slate-500">Tesla Model 3 • ABC-1234</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 mb-8">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-sm font-bold">Live Telemetry</h4>
+                            <span class="text-[10px] text-success animate-pulse flex items-center gap-1 font-bold">
+                                <span class="w-1.5 h-1.5 rounded-full bg-success"></span> LIVE
+                            </span>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-500">Current Speed</span>
+                                <span class="font-medium text-slate-900">42 mph</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-500">Deviation Distance</span>
+                                <span class="font-medium text-danger">312 meters</span>
+                            </div>
+                            <div class="w-full bg-slate-200 h-1 rounded-full overflow-hidden">
+                                <div class="bg-primary h-full w-[70%]"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <button class="flex-1 bg-primary text-white py-3 rounded-xl font-bold text-sm shadow-lg shadow-blue-100">Establish Call</button>
+                        <button class="flex-1 bg-danger text-white py-3 rounded-xl font-bold text-sm shadow-lg shadow-red-100">Escalate to Police</button>
+                    </div>
+                </div>
+            `;
+            
+            modal.style.display = 'flex';
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            document.getElementById('incident-modal').style.display = 'none';
+        }
+
+        function simulateDeviation() {
+            const newId = 'AL-' + Math.floor(1000 + Math.random() * 9000);
+            const newAlert = {
+                id: newId,
+                passenger: 'Alex Rivers',
+                driver: 'Carlos P.',
+                rideId: 'RD-901',
+                type: 'Route Deviation',
+                severity: 'warning',
+                time: 'Just now',
+                status: 'pending',
+                message: 'Unexpected turn detected onto private road.'
+            };
+            
+            alerts.unshift(newAlert);
+            addLog(`System triggered ${newId}: Route Deviation`);
+            renderAlerts();
+            renderStats();
+            showToast("🚨 High Priority Alert", `${newAlert.passenger}'s vehicle has deviated from the route.`);
+            
+            const count = document.getElementById('notif-count');
+            count.innerText = parseInt(count.innerText) + 1;
+            count.classList.remove('hidden');
+        }
+
+        function renderLogs() {
+            const logContainer = document.getElementById('action-logs');
+            logContainer.innerHTML = logs.map(log => `
+                <div class="flex gap-3 text-xs">
+                    <div class="text-slate-400 font-mono whitespace-nowrap">${log.time}</div>
+                    <div class="text-slate-700 font-medium">${log.action}</div>
+                </div>
+            `).join('');
+        }
+
+        function addLog(action) {
+            const now = new Date();
+            const time = now.getHours() + ':' + now.getMinutes().toString().padStart(2, '0');
+            logs.unshift({ id: Date.now(), action, time });
+            renderLogs();
+        }
+
+        function showToast(title, body) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = "bg-slate-900 text-white p-4 rounded-2xl shadow-2xl flex items-start gap-3 min-w-[320px] max-w-md alert-enter border border-white/10";
+            toast.innerHTML = `
+                <div class="bg-blue-500 p-1.5 rounded-lg">
+                    <i data-lucide="info" class="w-4 h-4"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-bold">${title}</p>
+                    <p class="text-xs text-slate-400 mt-1">${body}</p>
+                </div>
+            `;
+            container.appendChild(toast);
+            lucide.createIcons();
+            
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-x-full');
+                toast.style.transition = 'all 0.5s ease';
+                setTimeout(() => toast.remove(), 500);
+            }, 5000);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>

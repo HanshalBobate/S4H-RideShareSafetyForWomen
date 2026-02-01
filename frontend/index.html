@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S4H-1 | Ride-Share Safety Monitoring</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        danger: '#dc2626',
+                        success: '#16a34a',
+                        accent: '#0ea5e9',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 20px 40px -15px rgba(0, 0, 0, 0.05)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .hero-gradient {
+            background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent),
+                radial-gradient(circle at bottom left, rgba(14, 165, 233, 0.05), transparent);
+        }
+
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-white text-slate-900">
+
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="{{ url_for('index') }}" class="flex items-center gap-2">
+                <div class="bg-primary p-2 rounded-xl shadow-lg shadow-blue-200">
+                    <i data-lucide="shield-check" class="text-white w-6 h-6"></i>
+                </div>
+                <span class="text-2xl font-display font-bold tracking-tight text-slate-900">S4H-1</span>
+            </a>
+
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#features"
+                    class="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Features</a>
+                <a href="#mission"
+                    class="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Mission</a>
+                <div class="h-6 w-[1px] bg-slate-200"></div>
+
+                {% if current_user.is_authenticated %}
+                <span class="text-sm font-medium text-slate-500">Hi, {{ current_user.username }}</span>
+
+                {% if current_user.role == 'passenger' %}
+                <a href="{{ url_for('passenger_dashboard') }}"
+                    class="text-sm font-bold text-primary hover:underline">Dashboard</a>
+                {% endif %}
+
+                {% if current_user.role in ['operator', 'driver'] %}
+                <a href="{{ url_for('operator_dashboard') }}"
+                    class="text-sm font-bold text-primary hover:underline">Dashboard</a>
+                {% endif %}
+
+                {% if current_user.role == 'admin' %}
+                <a href="{{ url_for('admin_console') }}"
+                    class="bg-slate-900 text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-200">
+                    Admin Console
+                </a>
+                {% endif %}
+
+                <a href="#" onclick="logout()" class="text-sm font-medium text-slate-600 hover:text-danger">Logout</a>
+                {% else %}
+                <a href="{{ url_for('login_page') }}" class="text-sm font-bold text-primary hover:underline">
+                    Login
+                </a>
+                <a href="{{ url_for('register_page') }}"
+                    class="bg-primary text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-200">
+                    Sign Up
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        async function logout() {
+            try {
+                const response = await fetch('/api/logout', { method: 'POST' });
+                if (response.ok) {
+                    window.location.href = "{{ url_for('login_page') }}";
+                }
+            } catch (error) {
+                console.error('Logout failed', error);
+            }
+        }
+    </script>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 hero-gradient overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="animate-in fade-in slide-in-from-left-8 duration-700">
+                <span
+                    class="inline-block px-4 py-1.5 bg-blue-50 text-primary text-xs font-bold rounded-full mb-6 tracking-widest uppercase">
+                    Safety-First Ride Monitoring
+                </span>
+                <h1 class="text-5xl md:text-6xl font-display font-extrabold leading-tight mb-6">
+                    Redefining Safety in <span class="text-primary">Every Mile</span>
+                </h1>
+                <p class="text-lg text-slate-600 mb-10 leading-relaxed max-w-lg">
+                    A collaborative ecosystem connecting passengers, and local authorities to ensure safe journeys
+                    through real-time AI monitoring and rapid response.
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    {% if current_user.is_authenticated %}
+                    {% if current_user.role == 'passenger' %}
+                    <a href="{{ url_for('passenger_dashboard') }}"
+                        class="bg-primary text-white px-8 py-4 rounded-2xl font-bold text-center hover:bg-blue-700 transition-all shadow-2xl shadow-blue-200 flex items-center justify-center gap-2">
+                        Go to Passenger Dashboard
+                        <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </a>
+                    {% elif current_user.role in ['operator', 'driver'] %}
+                    <a href="{{ url_for('operator_dashboard') }}"
+                        class="bg-primary text-white px-8 py-4 rounded-2xl font-bold text-center hover:bg-blue-700 transition-all shadow-2xl shadow-blue-200 flex items-center justify-center gap-2">
+                        Go to Operator Dashboard
+                        <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </a>
+                    {% elif current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin_console') }}"
+                        class="bg-primary text-white px-8 py-4 rounded-2xl font-bold text-center hover:bg-blue-700 transition-all shadow-2xl shadow-blue-200 flex items-center justify-center gap-2">
+                        Go to Admin Console
+                        <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </a>
+                    {% endif %}
+                    {% else %}
+                    <a href="{{ url_for('passenger_dashboard') }}"
+                        class="bg-primary text-white px-8 py-4 rounded-2xl font-bold text-center hover:bg-blue-700 transition-all shadow-2xl shadow-blue-200 flex items-center justify-center gap-2">
+                        Get Started as Passenger
+                        <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </a>
+                    <a href="{{ url_for('operator_dashboard') }}"
+                        class="bg-white border-2 border-slate-100 text-slate-700 px-8 py-4 rounded-2xl font-bold text-center hover:border-primary hover:text-primary transition-all">
+                        Operator Access
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="relative lg:block flex justify-center animate-in fade-in slide-in-from-right-8 duration-1000">
+                <div class="relative w-full max-w-md float-animation">
+                    <div class="bg-white rounded-[40px] shadow-soft border border-slate-100 p-4 relative z-10">
+                        <img src="https://api.dicebear.com/7.x/shapes/svg?seed=safety" alt="S4H-1 App"
+                            class="rounded-[32px] w-full h-auto">
+                        <!-- Floating UI Elements -->
+                        <div
+                            class="absolute -top-6 -right-6 bg-success text-white p-4 rounded-2xl shadow-xl flex items-center gap-3">
+                            <i data-lucide="check-circle" class="w-5 h-5"></i>
+                            <span class="text-sm font-bold">Route Secure</span>
+                        </div>
+                        <div
+                            class="absolute -bottom-10 -left-6 bg-white p-4 rounded-2xl shadow-2xl border border-slate-50 flex items-center gap-3">
+                            <div class="bg-danger/10 p-2 rounded-lg text-danger">
+                                <i data-lucide="zap" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase">Alert Active</p>
+                                <p class="text-xs font-bold">Deviation Detected</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Role Selection Section -->
+    <section id="features" class="py-24 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-6 text-center mb-16">
+            <h2 class="text-3xl font-bold mb-4">Choose Your Portal</h2>
+            <p class="text-slate-500">Access the specific monitoring tools designed for your role in the safety network.
+            </p>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% if not current_user.is_authenticated or current_user.role == 'passenger' %}
+            <!-- Passenger -->
+            <div
+                class="bg-white p-8 rounded-[32px] shadow-soft border border-slate-100 hover:scale-[1.02] transition-transform">
+                <div class="w-14 h-14 bg-blue-50 text-primary rounded-2xl flex items-center justify-center mb-6">
+                    <i data-lucide="user" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Passenger</h3>
+                <p class="text-sm text-slate-500 mb-6 leading-relaxed">
+                    Monitor your live ride, share your location with trusted contacts, and access the instant panic
+                    button.
+                </p>
+                <a href="{{ url_for('passenger_dashboard') }}"
+                    class="text-primary font-bold text-sm flex items-center gap-2 group">
+                    Enter Dashboard
+                    <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+            {% endif %}
+
+            {% if not current_user.is_authenticated or current_user.role in ['operator', 'driver'] %}
+            <!-- Operator -->
+            <div
+                class="bg-white p-8 rounded-[32px] shadow-soft border border-slate-100 hover:scale-[1.02] transition-transform">
+                <div class="w-14 h-14 bg-accent/10 text-accent rounded-2xl flex items-center justify-center mb-6">
+                    <i data-lucide="activity" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Operator</h3>
+                <p class="text-sm text-slate-500 mb-6 leading-relaxed">
+                    Track multiple active rides, manage incoming alerts, and coordinate volunteer dispatches in
+                    real-time.
+                </p>
+                <a href="{{ url_for('operator_dashboard') }}"
+                    class="text-accent font-bold text-sm flex items-center gap-2 group">
+                    Monitor Live Feed
+                    <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+            {% endif %}
+
+            {% if not current_user.is_authenticated or current_user.role == 'admin' %}
+            <!-- Admin -->
+            <div
+                class="bg-white p-8 rounded-[32px] shadow-soft border border-slate-100 hover:scale-[1.02] transition-transform">
+                <div class="w-14 h-14 bg-slate-100 text-slate-900 rounded-2xl flex items-center justify-center mb-6">
+                    <i data-lucide="shield-alert" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-3">Authorities</h3>
+                <p class="text-sm text-slate-500 mb-6 leading-relaxed">
+                    Configure high-risk zones, set safety thresholds, and analyze system-wide incident reports.
+                </p>
+                <a href="{{ url_for('admin_console') }}"
+                    class="text-slate-900 font-bold text-sm flex items-center gap-2 group">
+                    Admin Console
+                    <i data-lucide="chevron-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="py-20 bg-primary text-white">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+                <p class="text-4xl font-bold mb-2">99.9%</p>
+                <p class="text-blue-100 text-sm">Safe Journeys</p>
+            </div>
+            <div>
+                <p class="text-4xl font-bold mb-2">&lt; 30s</p>
+                <p class="text-blue-100 text-sm">Response Time</p>
+            </div>
+            <div>
+                <p class="text-4xl font-bold mb-2">150+</p>
+                <p class="text-blue-100 text-sm">Active Operator Teams</p>
+            </div>
+            <div>
+                <p class="text-4xl font-bold mb-2">12k+</p>
+                <p class="text-blue-100 text-sm">Monitored Daily</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-slate-100">
+        <div
+            class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6 text-slate-400 text-sm">
+            <div class="flex items-center gap-2 grayscale">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+                <span class="font-bold text-slate-500 uppercase tracking-widest">S4H-1 Project</span>
+            </div>
+            <p>&copy; 2026 Ride-Share Safety Initiative. All rights reserved.</p>
+            <div class="flex gap-6">
+                <a href="#" class="hover:text-primary">Privacy</a>
+                <a href="#" class="hover:text-primary">Terms</a>
+                <a href="#" class="hover:text-primary">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
